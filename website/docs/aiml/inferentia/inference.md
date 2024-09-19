@@ -122,6 +122,7 @@ We copy this code to the Pod, download our previously uploaded model, and run th
 
 ```bash
 $ kubectl -n aiml cp ~/environment/eks-workshop/modules/aiml/inferentia/inference/inference.py inference:/
+$ kubectl -n aiml exec inference -- pip install --upgrade boto3 botocore
 $ kubectl -n aiml exec inference -- aws s3 cp s3://$AIML_NEURON_BUCKET_NAME/resnet50_neuron.pt ./
 $ kubectl -n aiml exec inference -- python /inference.py
 
