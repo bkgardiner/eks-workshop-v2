@@ -22,8 +22,8 @@ spec:
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values:
-            # HIGHLIGHT
-            - inf1
+            - inf2
+            - trn1
 ---
 apiVersion: karpenter.k8s.aws/v1beta1
 kind: EC2NodeClass
