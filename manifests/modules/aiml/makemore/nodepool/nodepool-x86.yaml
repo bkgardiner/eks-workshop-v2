@@ -1,0 +1,55 @@
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: aiml
+spec:
+  disruption:
+    consolidateAfter: 30s
+    consolidationPolicy: WhenEmpty
+    expireAfter: Never
+  template:
+    metadata:
+      labels:
+        type: karpenter
+        workload: jupyterhub
+    spec:
+      nodeClassRef:
+        name: jupyterhub
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values:
+            - on-demand
+            - spot
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values:
+            - c5
+            - m5
+            - r5
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+            - x86_64
+---
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: jupyterhub
+spec:
+  amiFamily: AL2
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        deleteOnTermination: true
+        volumeSize: 100Gi
+        volumeType: gp3
+  role: ${KARPENTER_NODE_ROLE}
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${EKS_CLUSTER_NAME}
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${EKS_CLUSTER_NAME}
+  tags:
+    app.kubernetes.io/created-by: eks-workshop
